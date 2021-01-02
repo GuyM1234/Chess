@@ -5,31 +5,52 @@ BLUE = (0,0,255)
 SQUARESIZE = 100
 last_piece_eaten = []
 
-class pawn(object):
-    offset_x = 5
+class piece(object):
+    offset_x = 0
     offset_y = 0
     def __init__(self, color, spot, piece_pic, piece_let):
         self.spot = spot
         self.color = color
         self.piece_pic = piece_pic
         self.piece_let = piece_let
-        
+    
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
+    def get_move_options(self, board):
+        pass
+    # פעולה המזיזה את החייל על הלוח ואת עצמו (התכונת מקום שלו)
+    def move(self, chosen_spot, option_list, board):
+        option_list.append((self.spot)) 
+        board.update_board(chosen_spot,self)   
+        self.spot = chosen_spot
+    
+    #  פעולה המחזירה העתק בעל יחוס אחר לאובייקט
+    def create_copy(self):
+        return type(self)(self.color, self.spot,self.piece_pic,self.piece_let)
+    
+    # פעולה לצייר על המסך את הכלי
+    def draw(self,screen):
+        screen.blit(self.piece_pic, ((self.spot[1])* SQUARESIZE + 70 + self.offset_x, (self.spot[0]) * SQUARESIZE + 65 + self.offset_y))
+        pygame.display.update()
+
+class pawn(piece):
+    offset_x = 5
+    offset_y = 0
     def get_move_options(self, board):
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
-        if self.color == "w" and rowpos < 7:
+        if self.color == "b" and rowpos < 7:
             if board[rowpos + 1][columnpos].color == "e":
                 option_list.append((rowpos + 1, columnpos))
                 if rowpos == 1 and board[rowpos + 2][columnpos].color == "e":
                     option_list.append((rowpos + 2, columnpos))
 
             if columnpos != 7:
-                if board[rowpos + 1][columnpos + 1].color == "b":
+                if board[rowpos + 1][columnpos + 1].color == "w":
                     option_list.append((rowpos + 1, columnpos + 1))
 
             if columnpos != 0:
-                if board[rowpos + 1][columnpos - 1].color == "b":
+                if board[rowpos + 1][columnpos - 1].color == "w":
                     option_list.append((rowpos + 1, columnpos - 1))
         elif rowpos > 0:
             if board[rowpos - 1][columnpos].color == "e":
@@ -38,53 +59,44 @@ class pawn(object):
                     option_list.append((rowpos - 2, columnpos))
 
             if columnpos != 0:
-                if board[rowpos - 1][columnpos - 1].color == "w":
+                if board[rowpos - 1][columnpos - 1].color == "b":
                     option_list.append((rowpos - 1, columnpos - 1))
 
             if columnpos != 7:
                 if board[rowpos - 1][columnpos + 1] != 0:
-                    if board[rowpos - 1][columnpos + 1].color == "w":
+                    if board[rowpos - 1][columnpos + 1].color == "b":
                         option_list.append((rowpos - 1, columnpos + 1))
         return option_list
 
-    def move(self, chosen_spot, option_list, board):
-        option_list.append((self.spot)) 
-        board.update_board(chosen_spot,self)   
-        self.spot = chosen_spot
-
-    def create_copy(self):
-        return type(self)(self.color, self.spot,self.piece_pic,self.piece_let)
-    
-    def draw_piece(self,screen):
-        screen.blit(self.piece_pic, ((self.spot[1])* SQUARESIZE + 70 + self.offset_x, (self.spot[0]) * SQUARESIZE + 65 + self.offset_y))
-        pygame.display.update()
-               
-class rook(pawn):
+class rook(piece):
     offset_x = 0
     offset_y = 0
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples  
     def get_move_options(self, board):
         option_list = get_horizontal_options(self.spot, self.color, board)
         return option_list
  
-class bishop(pawn):
+class bishop(piece):
     offset_x = 0
     offset_y = 0
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
         option_list = get_diaganol_options(self.spot, self.color, board)
         return option_list
 
-class queen(pawn):
+class queen(piece):
     offset_x = - 2
     offset_y = + 3
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
         option_list = get_diaganol_options(self.spot, self.color, board)
         option_list.extend(get_horizontal_options(self.spot, self.color, board))
         return option_list
 
-class king(pawn):
+class king(piece):
     offset_x = - 2
     offset_y = + 3
-    king = True
+    # פעולה מחזירה את כל אפשרויות ההזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
         rowpos = self.spot[0]
         columnpos = self.spot[1]
@@ -120,12 +132,13 @@ class king(pawn):
         if rowpos > 0 and columnpos < 7:
             if board[rowpos - 1][columnpos + 1].color != self.color:
                 option_list.append((rowpos - 1, columnpos + 1))
+        
         return option_list
 
-class knight(pawn):
+class knight(piece):
     offset_x = 0
     offset_y = 0
-    king = False
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
         rowpos = self.spot[0]
         columnpos = self.spot[1]
@@ -164,6 +177,7 @@ class knight(pawn):
                 option_list.append((rowpos - 1, columnpos + 2))
         return option_list
 
+# אובייקט ריק שיופיע במקומות בלוח שבהן אין כלי בשביל לחסוך בדיקות האם המקום ריק
 class empty():
     def __init__(self):
         self.color = "e"
@@ -171,6 +185,8 @@ class empty():
 
     def create_copy(self):
         return empty()
+
+# פעולה מחזירה את כל אפשרויות הזזה של נקודה באלכסון ברשימה של tuples 
 def get_diaganol_options(spot, color, board):
     rowpos = spot[0]
     columnpos = spot[1]
@@ -234,6 +250,7 @@ def get_diaganol_options(spot, color, board):
         rowpos += 1
     return option_list
 
+# פעולה מחזירה את כל אפשרויות הזזה של נקודה בישר ברשימה של tuples 
 def get_horizontal_options(spot, color, board):
     option_list = []
     blocked = False
