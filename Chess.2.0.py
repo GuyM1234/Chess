@@ -72,9 +72,10 @@ def run_play(piece,board,screen,turn):
             if chosen_spot in option_list:
                 turn = update_turn(turn)
                 piece.move(chosen_spot, option_list, board)
-                board.clearSquare(piece.spot[1] * SQUARESIZE + 50, piece.spot[0] * SQUARESIZE + 50,screen)
+                board.update_kings(piece,chosen_spot)
+          
                 board.remove_option(screen, option_list,piece.color,board)
-                screen.blit(piece.piece_pic, (chosen_spot[1] * SQUARESIZE + 70 + piece.offset_x, chosen_spot[0] * SQUARESIZE + 65 + piece.offset_y))
+                piece.draw(screen)
             else:
                 board.remove_option(screen, option_list,piece.color,board)
     return turn
@@ -102,7 +103,7 @@ def main():
                 row_pos = (chosen_ypos - 50) // 100
                 piece = board.board[row_pos][column_pos]
                 turn = run_play(piece,board,screen,turn)
-                board.update_kings(piece)
+                
                 pygame.draw.rect(screen, BLACK, (10,5,100,25))                
                 if board.is_check():
                     if board.is_checkmate(turn):
