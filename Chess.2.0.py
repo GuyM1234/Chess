@@ -72,7 +72,7 @@ def run_play(piece,board,screen,turn):
             if chosen_spot in option_list:
                 turn = update_turn(turn)
                 piece.move(chosen_spot, option_list, board)
-          
+                board.turn_pawn(piece)
                 board.remove_option(screen, option_list,piece.color,board)
                 piece.draw(screen)
             else:
@@ -103,7 +103,7 @@ def main():
                 piece = board.board[row_pos][column_pos]
                 turn = run_play(piece,board,screen,turn)
                 pygame.draw.rect(screen, BLACK, (10,5,100,25))                
-                if board.check_self_king(turn):
+                if board.is_check(turn):
                     if board.is_checkmate(turn):
                         message_to_screen("CHECKMATE",WHITE,font,screen)
                         pygame.time.wait(10000)
