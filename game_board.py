@@ -5,18 +5,18 @@ WHITE = (255,255,255)
 SQUARESIZE = 100
 from piece import pawn, king, queen, rook, bishop, knight, empty
 
-BlackPawn = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackPawn.png')
-WhitePawn = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhitePawn.png')
-WhiteRook = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhiteRook.png')
-BlackRook = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackRook.png')
-WhiteBishop = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhiteBishop.png')
-BlackBishop = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackBishop.png')
-WhiteKnight = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhiteKnight.png')
-BlackKnight = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackKnight.png')
-WhiteQueenPic = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhiteQueen.png')
-BlackQueenPic = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackQueen.png')
-WhiteKingPic = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\WhiteKing.png')
-BlackKingPic = pygame.image.load(r'C:\Users\user\Desktop\Computer_Science\Python.Proj\Chess\Chesspieces\BlackKing.png')
+BlackPawn = pygame.image.load(r'Chesspieces\BlackPawn.png')
+WhitePawn = pygame.image.load(r'Chesspieces\WhitePawn.png')
+WhiteRook = pygame.image.load(r'Chesspieces\WhiteRook.png')
+BlackRook = pygame.image.load(r'Chesspieces\BlackRook.png')
+WhiteBishop = pygame.image.load(r'Chesspieces\WhiteBishop.png')
+BlackBishop = pygame.image.load(r'Chesspieces\BlackBishop.png')
+WhiteKnight = pygame.image.load(r'Chesspieces\WhiteKnight.png')
+BlackKnight = pygame.image.load(r'Chesspieces\BlackKnight.png')
+WhiteQueen = pygame.image.load(r'Chesspieces\WhiteQueen.png')
+BlackQueen = pygame.image.load(r'Chesspieces\BlackQueen.png')
+WhiteKing = pygame.image.load(r'Chesspieces\WhiteKing.png')
+BlackKing = pygame.image.load(r'Chesspieces\BlackKing.png')
 
 class game_board(object):
     def __init__(self,screen):
@@ -27,8 +27,8 @@ class game_board(object):
     # בונה את הלוח עם כל החלקים
     def create_board(self,screen):
         board = [[empty() for x in range(8)] for i in range(8)]
-        board[7][4] = king("w", (7, 4) , WhiteKingPic, "K")
-        board[7][3] = queen("w",(7,3)  , WhiteQueenPic, "Q")
+        board[7][4] = king("w", (7, 4) , WhiteKing, "K")
+        board[7][3] = queen("w",(7,3)  , WhiteQueen, "Q")
         board[7][0] = rook("w", (7, 0), WhiteRook, "R")
         board[7][7] = rook("w", (7, 7), WhiteRook, "R")
         board[7][2] = bishop("w", (7, 2), WhiteBishop, "B")
@@ -38,8 +38,8 @@ class game_board(object):
         for i in range(8):
             board[6][i] = pawn("w",(6,i), WhitePawn, "P")
             board[1][i] = pawn("b",(1,i), BlackPawn, "P")
-        board[0][4] = king("b", (0, 4), BlackKingPic, "K")
-        board[0][3] = queen("b",(0,3), BlackQueenPic, "Q")
+        board[0][4] = king("b", (0, 4), BlackKing, "K")
+        board[0][3] = queen("b",(0,3), BlackQueen, "Q")
         board[0][0] = rook("b", (0, 0), BlackRook, "R")
         board[0][7] = rook("b", (0, 7), BlackRook, "R")
         board[0][2] = bishop("b", (0, 2), BlackBishop, "B") 
@@ -68,11 +68,11 @@ class game_board(object):
         print(board_printed)
    
     # פעולה מעדכנת את הלוח
-    def update_board(self,chosen_spot,piece):
+    def update(self,chosen_spot,piece):
         self.board[chosen_spot[0]][chosen_spot[1]] = piece
         self.board[piece.spot[0]][piece.spot[1]] = empty()
    
-   # פעולה המסירה את הנקודות של האפשרויות על המסך
+    # פעולה המסירה את הנקודות של האפשרויות על המסך
     def remove_option(self, screen, option_list, color, board):
         for option in option_list:
             xpos = option[1] * SQUARESIZE + 70
@@ -88,26 +88,28 @@ class game_board(object):
         color = screen.get_at((xpos,ypos))
         pygame.draw.rect(screen, color, (xpos, ypos, 100, 100))
 
-    def is_check(self):
+    # בודק האם המלך שלך בשח
+    def check_self_king(self, color):
         for row in self.board:
-            for piece in row:
-                if piece.color != "e":
-                    option_list = piece.get_move_options(self.board)
-                    if piece.color == "b":
-                        if self.white_king_spot in option_list:
-                            return True
-                    elif self.black_king_spot in option_list:
+            for piece in row:              
+                option_list = piece.get_move_options(self.board)
+                if "w" == color:
+                    if self.white_king_spot in option_list:
+                        return True
+                else:
+                    if self.black_king_spot in option_list:
                         return True
         return False
+
 
     def get_avalibale_moves(self, piece, option_list):
         i = 0
         while i < len(option_list):
             option = option_list[i]
             copy_board = copy_game_board(self)
-            copy_board.update_kings(piece,option)
-            copy_board.update_board(option, piece)
-            if copy_board.is_check():
+            empty = []
+            copy_board.board[piece.spot[0]][piece.spot[1]].move(option, empty, copy_board)
+            if copy_board.check_self_king(piece.color):
                 option_list.remove(option)
                 i =-1
             i+=1
