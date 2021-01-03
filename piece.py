@@ -16,11 +16,13 @@ class piece(object):
     
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
-        pass
+        option_list = []
+        return option_list
+
     # פעולה המזיזה את החייל על הלוח ואת עצמו (התכונת מקום שלו)
     def move(self, chosen_spot, option_list, board):
         option_list.append((self.spot)) 
-        board.update_board(chosen_spot,self)   
+        board.update(chosen_spot,self)   
         self.spot = chosen_spot
     
     #  פעולה המחזירה העתק בעל יחוס אחר לאובייקט
@@ -135,6 +137,14 @@ class king(piece):
         
         return option_list
 
+    # פעולת הזזה למלך, שונה משאר הפעולות כי מזיזה את מקום המלך באובייקט מלך
+    def move(self, chosen_spot, option_list, board):
+        super().move(chosen_spot, option_list, board)
+        if self.color == "w":
+            board.white_king_spot = chosen_spot
+        else:
+            board.black_king_spot = chosen_spot
+
 class knight(piece):
     offset_x = 0
     offset_y = 0
@@ -178,7 +188,7 @@ class knight(piece):
         return option_list
 
 # אובייקט ריק שיופיע במקומות בלוח שבהן אין כלי בשביל לחסוך בדיקות האם המקום ריק
-class empty():
+class empty(piece):
     def __init__(self):
         self.color = "e"
         self.piece_let = "0"
