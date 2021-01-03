@@ -89,7 +89,7 @@ class game_board(object):
         pygame.draw.rect(screen, color, (xpos, ypos, 100, 100))
 
     # בודק האם המלך שלך בשח
-    def check_self_king(self, color):
+    def is_check(self, color):
         for row in self.board:
             for piece in row:              
                 option_list = piece.get_move_options(self.board)
@@ -101,7 +101,7 @@ class game_board(object):
                         return True
         return False
 
-
+    # עולה המחזירה את אפשרויות התזוזה אם לא יצרו שח
     def get_avalibale_moves(self, piece, option_list):
         i = 0
         while i < len(option_list):
@@ -109,12 +109,13 @@ class game_board(object):
             copy_board = copy_game_board(self)
             empty = []
             copy_board.board[piece.spot[0]][piece.spot[1]].move(option, empty, copy_board)
-            if copy_board.check_self_king(piece.color):
+            if copy_board.is_check(piece.color):
                 option_list.remove(option)
                 i =-1
             i+=1
         return option_list
-
+    
+    # פעולה המחזירה האם המלך שלך בשח
     def is_checkmate(self,turn):
         for row in self.board:
             for piece in row:
@@ -124,13 +125,11 @@ class game_board(object):
                         return False
         return True
 
-    def update_kings(self,piece,chosen_spot):
-        if piece.piece_let == "K":
-            if piece.color == "w":
-                self.white_king_spot = chosen_spot
-            else:
-                self.black_king_spot = chosen_spot
-        
+    def turn_pawn(self,piece):
+        if str(type(piece)) == "pawn":
+            if piece.spot[1] == 0 or piece.spot[1] == 7:
+                self.board[piece.spot[0]][piece.spot] == queen(piece.color,piece.spot,BlackQueen,"Q")
+            
 class copy_game_board(game_board):
     def __init__(self,board):
         self.white_king_spot = board.white_king_spot
