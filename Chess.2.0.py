@@ -65,14 +65,13 @@ def draw_options(option_list, screen):
 def run_play(piece,board,screen,turn):
     if turn == piece.color:
         option_list = piece.get_move_options(board.board)
-        option_list = board.get_avalibale_moves(piece, option_list)
+        option_list = board.get_avalibale_moves(piece,option_list)
         if len(option_list) > 0:
             draw_options(option_list,screen)
             chosen_spot = get_mouse_pos()
             if chosen_spot in option_list:
                 turn = update_turn(turn)
                 piece.move(chosen_spot, option_list, board)
-                board.update_kings(piece,chosen_spot)
           
                 board.remove_option(screen, option_list,piece.color,board)
                 piece.draw(screen)
@@ -103,11 +102,11 @@ def main():
                 row_pos = (chosen_ypos - 50) // 100
                 piece = board.board[row_pos][column_pos]
                 turn = run_play(piece,board,screen,turn)
-                
                 pygame.draw.rect(screen, BLACK, (10,5,100,25))                
-                if board.is_check():
+                if board.check_self_king(turn):
                     if board.is_checkmate(turn):
                         message_to_screen("CHECKMATE",WHITE,font,screen)
+                        pygame.time.wait(10000)
                         checkmate = True
                     else:
                         message_to_screen("CHECK",WHITE,font,screen)
