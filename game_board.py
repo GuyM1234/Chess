@@ -20,14 +20,20 @@ BlackKing = pygame.image.load(r'Chesspieces\BlackKing.png')
 
 class game_board(object):
     def __init__(self,screen):
-        self.white_king_spot = (7, 4)
-        self.black_king_spot = (0, 4)
+        self.white_king = king("w", (7, 4) , WhiteKing, "K")
+        self.black_king = king("b", (0, 4), BlackKing, "K")
         self.board = self.create_board(screen)
+        # self.black_rook1_moved = False
+        # self.black_rook2_moved = False
+        # self.white_rook1_moved = False
+        # self.white_rook2_moved = False
+        # self.white_king_moved = False
+        # self.black_king_moved = False
     
     # בונה את הלוח עם כל החלקים
     def create_board(self,screen):
         board = [[empty() for x in range(8)] for i in range(8)]
-        board[7][4] = king("w", (7, 4) , WhiteKing, "K")
+        board[7][4] = self.white_king
         board[7][3] = queen("w",(7,3)  , WhiteQueen, "Q")
         board[7][0] = rook("w", (7, 0), WhiteRook, "R")
         board[7][7] = rook("w", (7, 7), WhiteRook, "R")
@@ -38,7 +44,7 @@ class game_board(object):
         for i in range(8):
             board[6][i] = pawn("w",(6,i), WhitePawn, "P")
             board[1][i] = pawn("b",(1,i), BlackPawn, "P")
-        board[0][4] = king("b", (0, 4), BlackKing, "K")
+        board[0][4] = self.black_king
         board[0][3] = queen("b",(0,3), BlackQueen, "Q")
         board[0][0] = rook("b", (0, 0), BlackRook, "R")
         board[0][7] = rook("b", (0, 7), BlackRook, "R")
@@ -89,15 +95,15 @@ class game_board(object):
         pygame.draw.rect(screen, color, (xpos, ypos, 100, 100))
 
     # בודק האם המלך שלך בשח
-    def is_check(self, color):
+    def is_check(self, turn):
         for row in self.board:
             for piece in row:              
                 option_list = piece.get_move_options(self.board)
-                if "w" == color:
-                    if self.white_king_spot in option_list:
+                if "w" == turn:
+                    if self.white_king.spot in option_list:
                         return True
                 else:
-                    if self.black_king_spot in option_list:
+                    if self.black_king.spot in option_list:
                         return True
         return False
 
@@ -108,7 +114,8 @@ class game_board(object):
             option = option_list[i]
             copy_board = copy_game_board(self)
             empty = []
-            copy_board.board[piece.spot[0]][piece.spot[1]].move(option, empty, copy_board)
+            piece_moving = copy_board.board[piece.spot[0]][piece.spot[1]]
+            piece_moving.move(option, empty, copy_board) #מעדכן את הלוח המועתק בשביל לבדוק האם יש שח אחרי מהלך
             if copy_board.is_check(piece.color):
                 option_list.remove(option)
                 i =-1
@@ -125,16 +132,28 @@ class game_board(object):
                         return False
         return True
 
-    def turn_pawn(self,piece):
-        if str(type(piece)) == "pawn":
-            if piece.spot[1] == 0 or piece.spot[1] == 7:
-                self.board[piece.spot[0]][piece.spot] == queen(piece.color,piece.spot,BlackQueen,"Q")
-            
+
+    def is_pat(self,turn):
+        return self.is_checkmate(turn)
+
+    def castle(self,king,squares_checkinng):
+        prevlength = len(squares_checkinng)
+        if not king.moved:
+            for square in squares_checkinng:
+                if self.board[square[0]][square[1]].color != "e":
+                    return False
+        else:
+            return False
+        squares_checkinng = self.get_avalibale_moves(king,squares_checkinng)
+        if len(squares_checkinng) == prevlength:
+            return True
+        return False    
+
 class copy_game_board(game_board):
     def __init__(self,board):
-        self.white_king_spot = board.white_king_spot
-        self.black_king_spot = board.black_king_spot
         self.board = self.create_board(board)
+        self.white_king = self.board[board.white_king.spot[0]][board.white_king.spot[1]]
+        self.black_king = self.board[board.black_king.spot[0]][board.black_king.spot[1]]
 
     def create_board(self,board):
         copy_board = []
