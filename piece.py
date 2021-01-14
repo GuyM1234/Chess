@@ -1,9 +1,4 @@
 import pygame
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-BLUE = (0,0,255)
-SQUARESIZE = 100
-last_piece_eaten = []
 WhiteQueen = pygame.image.load(r'Chesspieces\WhiteQueen.png')
 BlackQueen = pygame.image.load(r'Chesspieces\BlackQueen.png')
 
@@ -15,6 +10,7 @@ class piece(object):
         self.color = color
         self.piece_pic = piece_pic
         self.piece_let = piece_let
+        self.moved = False
     
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, board):
@@ -26,50 +22,35 @@ class piece(object):
         option_list.append((self.spot))
         board.update(chosen_spot,self)   
         self.spot = chosen_spot
+        if not self.moved:
+            self.moved = True
     
-    #  פעולה המחזירה העתק בעל יחוס אחר לאובייקט
+    # פעולה המחזירה העתק בעל יחוס אחר לאובייקט
     def create_copy(self):
         return type(self)(self.color, self.spot,self.piece_pic,self.piece_let)
     
-    # פעולה לצייר על המסך את הכלי
-    def draw(self,screen):
-        screen.blit(self.piece_pic, ((self.spot[1])* SQUARESIZE + 70 + self.offset_x, (self.spot[0]) * SQUARESIZE + 65 + self.offset_y))
-        pygame.display.update()
-
 class pawn(piece):
     offset_x = 5
-    offset_y = 0  
-    def get_move_options(self, board):
+    offset_y = 0
+    # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
+    def get_move_options(self, game_board):
+        board = game_board.board
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
-        if self.color == "b" and rowpos < 7:
-            if board[rowpos + 1][columnpos].color == "e":
-                option_list.append((rowpos + 1, columnpos))
-                if rowpos == 1 and board[rowpos + 2][columnpos].color == "e":
-                    option_list.append((rowpos + 2, columnpos))
-
-            if columnpos != 7:
-                if board[rowpos + 1][columnpos + 1].color == "w":
-                    option_list.append((rowpos + 1, columnpos + 1))
-
-            if columnpos != 0:
-                if board[rowpos + 1][columnpos - 1].color == "w":
-                    option_list.append((rowpos + 1, columnpos - 1))
-        elif rowpos > 0:
+        if rowpos > 0:
             if board[rowpos - 1][columnpos].color == "e":
                 option_list.append((rowpos - 1, columnpos))
                 if rowpos == 6 and board[rowpos - 2][columnpos].color == "e":
                     option_list.append((rowpos - 2, columnpos))
 
             if columnpos != 0:
-                if board[rowpos - 1][columnpos - 1].color == "b":
+                if board[rowpos - 1][columnpos - 1].color != self.color and board[rowpos - 1][columnpos - 1].color != 'e':
                     option_list.append((rowpos - 1, columnpos - 1))
 
             if columnpos != 7:
-                if board[rowpos - 1][columnpos + 1] != 0:
-                    if board[rowpos - 1][columnpos + 1].color == "b":
-                        option_list.append((rowpos - 1, columnpos + 1))
+                if board[rowpos - 1][columnpos + 1].color != self.color and board[rowpos - 1][columnpos + 1].color != 'e':
+                    option_list.append((rowpos - 1, columnpos + 1))
         return option_list
 
     def move(self, chosen_spot, option_list, board):
@@ -84,7 +65,8 @@ class rook(piece):
     offset_x = 0
     offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples  
-    def get_move_options(self, board):
+    def get_move_options(self, game_board):
+        board = game_board.board
         option_list = []
         blocked = False
         rowpos = self.spot[0]
@@ -144,7 +126,8 @@ class bishop(piece):
     offset_x = 0
     offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
-    def get_move_options(self, board):
+    def get_move_options(self, game_board):
+        board = game_board.board
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
@@ -211,20 +194,18 @@ class queen(bishop,rook):
     offset_x = - 2
     offset_y = + 3
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
-    def get_move_options(self, board):
-        option_list = bishop.get_move_options(self,board)
-        option_list.extend(rook.get_move_options(self,board))
+    def get_move_options(self, game_board):
+        option_list = bishop.get_move_options(self,game_board)
+        option_list.extend(rook.get_move_options(self,game_board))
         return option_list
 
 class king(piece):
     offset_x = - 2
     offset_y = + 3
-    def __init__(self, color, spot, piece_pic, piece_let):
-        super().__init__(color, spot, piece_pic, piece_let)
-        self.moved = False
-
+        
     # פעולה מחזירה את כל אפשרויות ההזה של כלי ברשימה של tuples 
-    def get_move_options(self, board):
+    def get_move_options(self, game_board):
+        board = game_board.board
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
@@ -260,13 +241,34 @@ class king(piece):
             if board[rowpos - 1][columnpos + 1].color != self.color:
                 option_list.append((rowpos - 1, columnpos + 1))
         
+        if self.castle(game_board,[(self.spot[0],3),(self.spot[0],2),(self.spot[0],1)], game_board.board[self.spot[0]][0]):
+            option_list.append((self.spot[0],2))
+        
+        if self.castle(game_board,[(self.spot[0],5),(self.spot[0],6)], game_board.board[self.spot[0]][7]):
+            option_list.append((self.spot[0],6))
+
         return option_list
+
+
+    def castle(self,board,squares_checkinng, rook):
+        prevlength = len(squares_checkinng)
+        if not self.moved and not rook.moved:
+            for square in squares_checkinng:
+                if board.board[square[0]][square[1]].color != "e":
+                    return False
+        else:
+            return False
+        squares_checkinng = board.get_avalibale_moves(self,squares_checkinng)
+        if len(squares_checkinng) == prevlength:
+            return True
+        return False
 
 class knight(piece):
     offset_x = 0
     offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
-    def get_move_options(self, board):
+    def get_move_options(self, game_board):
+        board = game_board.board
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
@@ -274,7 +276,6 @@ class knight(piece):
             if board[rowpos + 2][columnpos + 1].color != self.color:
                 option_list.append((rowpos + 2, columnpos + 1))
                 
-
         if rowpos < 6 and columnpos > 0:
             if board[rowpos + 2][columnpos - 1].color != self.color:
                 option_list.append((rowpos + 2, columnpos - 1))
@@ -309,6 +310,8 @@ class empty(piece):
     def __init__(self):
         self.color = "e"
         self.piece_let = "0"
+        self.moved = True
 
     def create_copy(self):
         return empty()
+
