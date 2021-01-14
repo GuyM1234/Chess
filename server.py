@@ -37,7 +37,6 @@ def threaded_client(conn,color,game):
                 if game.turn == 'w':
                     game.white_time = int(data)
                 else:
-                    
                     game.black_time = int(data)
             elif data:
                 game.status = data
