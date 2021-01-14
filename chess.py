@@ -95,23 +95,29 @@ def main():
         game = n.get("get")
         if game.ready:
             while not game_over:
-                graphics.draw_timer(get_time(game),800,10)
+                graphics.draw_timer(get_time(game),10,10)
                 pygame.event.get()
                 game = n.get("get")
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
+                        stop_cloak = False
                         pygame.draw.rect(screen, BLACK, (400, 10, 100, 40))
                         graphics.small_message(game.status,WHITE,400,10)
+                        timer = threading.Thread(target=countdown, args=[get_time(game),n,10,860, lambda : stop_cloak,])
+                        timer.start()
+                        
                     if game.status != "CHECKMATE" and game.status != "PAT":
                         turnMade = None
-                        stop_cloak = False
                         while turnMade == None:
                             chosen_spot = graphics.get_mouse_pos()
                             piece = board.board[chosen_spot[0]][chosen_spot[1]]
                             turnMade = run_play(piece,board,screen,player,n)
-                            stop_cloak = True
                         
+                        if game.piece_spot[0] != None:
+                            stop_cloak = True
+                            timer.join()
+
                         pygame.draw.rect(screen, BLACK, (400, 10, 100, 40))
                         status = return_status(board.get_oppisite_color(game.turn),board)
                         graphics.small_message(status,WHITE,400,10)

@@ -60,7 +60,7 @@ class graphics_methods(object):
             self.draw(board[7][i])
         
         self.draw_timer(900,10,10)
-        self.draw_timer(900,800,10)
+        self.draw_timer(900,10,860)
     
     # פעולה המחזירה את מיקום הלחיצה
     def get_mouse_pos(self):
