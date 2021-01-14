@@ -38,19 +38,18 @@ class pawn(piece):
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
-        if rowpos > 0:
-            if board[rowpos - 1][columnpos].color == "e":
-                option_list.append((rowpos - 1, columnpos))
-                if rowpos == 6 and board[rowpos - 2][columnpos].color == "e":
-                    option_list.append((rowpos - 2, columnpos))
+        if board[rowpos - 1][columnpos].color == "e":
+            option_list.append((rowpos - 1, columnpos))
+            if rowpos == 6 and board[rowpos - 2][columnpos].color == "e":
+                option_list.append((rowpos - 2, columnpos))
 
-            if columnpos != 0:
-                if board[rowpos - 1][columnpos - 1].color != self.color and board[rowpos - 1][columnpos - 1].color != 'e':
-                    option_list.append((rowpos - 1, columnpos - 1))
+        if columnpos != 0:
+            if board[rowpos - 1][columnpos - 1].color != self.color and board[rowpos - 1][columnpos - 1].color != 'e':
+                option_list.append((rowpos - 1, columnpos - 1))
 
-            if columnpos != 7:
-                if board[rowpos - 1][columnpos + 1].color != self.color and board[rowpos - 1][columnpos + 1].color != 'e':
-                    option_list.append((rowpos - 1, columnpos + 1))
+        if columnpos != 7:
+            if board[rowpos - 1][columnpos + 1].color != self.color and board[rowpos - 1][columnpos + 1].color != 'e':
+                option_list.append((rowpos - 1, columnpos + 1))
         return option_list
 
     def move(self, chosen_spot, option_list, board):
