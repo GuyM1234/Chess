@@ -63,9 +63,11 @@ class graphics_methods(object):
         pygame.draw.rect(self.screen, color, (xpos, ypos, self.squaresize, self.squaresize))
 
     # פעולה המציירת את הלוח
-    def draw_board(self,board):
-        colors = (color1,color2)
+    def draw_board(self,board,color):
         i = 0
+        if color == 'b':
+            i += 1
+        colors = (color1,color2)
         for r in range(8):
             for c in range(8):
                 i += 1
@@ -131,6 +133,7 @@ class graphics_methods(object):
         self.screen.blit(piece_pic.pic, (piece.spot[1] * self.squaresize + xpos_offset, piece.spot[0] * self.squaresize + ypos_offset))
         pygame.display.update()
 
+    # 
     def cover_text(self,xpos,ypos,width,height):
          pygame.draw.rect(self.screen, BLACK, (round(xpos), round(ypos), round(width), round(height)))
 
