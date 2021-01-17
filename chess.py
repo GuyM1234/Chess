@@ -113,7 +113,8 @@ def main():
     n = Network()
     player = n.getP()
     board = game_board(player)
-    graphics.draw_board(board.board)
+
+    graphics.draw_board(board.board,player)
     graphics.small_message("Player " + player, WHITE, graphics.squaresize * 4 - graphics.squaresize * 0.1, graphics.squaresize * 8 + graphics.border * 1.1)
     
     pygame.display.update()
