@@ -1,14 +1,8 @@
-import pygame
-WhiteQueen = pygame.image.load(r'Chesspieces\WhiteQueen.png')
-BlackQueen = pygame.image.load(r'Chesspieces\BlackQueen.png')
 
 class piece(object):
-    offset_x = 0
-    offset_y = 0
-    def __init__(self, color, spot, piece_pic, piece_let):
+    def __init__(self, color, spot, piece_let):
         self.spot = spot
         self.color = color
-        self.piece_pic = piece_pic
         self.piece_let = piece_let
         self.moved = False
     
@@ -27,11 +21,9 @@ class piece(object):
     
     # פעולה המחזירה העתק בעל יחוס אחר לאובייקט
     def create_copy(self):
-        return type(self)(self.color, self.spot,self.piece_pic,self.piece_let)
+        return type(self)(self.color, self.spot,self.piece_let)
     
 class pawn(piece):
-    offset_x = 5
-    offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
         board = game_board.board
@@ -56,13 +48,11 @@ class pawn(piece):
         super().move(chosen_spot, option_list, board)
         if self.spot[0] == 0 or self.spot[0] == 7:
             if self.color == "w":
-                board.board[self.spot[0]][self.spot[1]] = queen(self.color, self.spot, WhiteQueen, "Q")
+                board.board[self.spot[0]][self.spot[1]] = queen(self.color, self.spot, "Q")
             else:
-                board.board[self.spot[0]][self.spot[1]] = queen(self.color, self.spot, BlackQueen, "Q")
+                board.board[self.spot[0]][self.spot[1]] = queen(self.color, self.spot, "Q")
 
 class rook(piece):
-    offset_x = 0
-    offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples  
     def get_move_options(self, game_board):
         board = game_board.board
@@ -122,8 +112,6 @@ class rook(piece):
         return option_list
  
 class bishop(piece):
-    offset_x = 0
-    offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
         board = game_board.board
@@ -190,18 +178,13 @@ class bishop(piece):
         return option_list
 
 class queen(bishop,rook):
-    offset_x = - 2
-    offset_y = + 3
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
         option_list = bishop.get_move_options(self,game_board)
         option_list.extend(rook.get_move_options(self,game_board))
         return option_list
 
-class king(piece):
-    offset_x = - 2
-    offset_y = + 3
-        
+class king(piece):  
     # פעולה מחזירה את כל אפשרויות ההזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
         board = game_board.board
@@ -263,8 +246,6 @@ class king(piece):
         return False
 
 class knight(piece):
-    offset_x = 0
-    offset_y = 0
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
         board = game_board.board

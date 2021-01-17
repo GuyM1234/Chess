@@ -12,7 +12,7 @@ class Game(object):
 
     def move(self):
         return (f"{self.piece_spot} {self.chosen_spot}")
-    
+ 
     def update_turn(self):
         if self.turn == 'w':
             self.turn = 'b'

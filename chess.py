@@ -29,14 +29,6 @@ except:
         except:
             print("[ERROR 1] Pygame could not be installed")
 
-
-
-
-
-
-
-import pygame
-import copy
 import time
 from piece import pawn, king, queen, rook, bishop, knight, empty
 from game_board import game_board, copy_game_board
@@ -45,18 +37,18 @@ from game import Game
 from graphics import graphics_methods
 import threading
 
-
+squaresize = int(input("Enter Square Size "))
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 pygame.init()
-font1 = pygame.font.SysFont(None ,40)
+font1 = pygame.font.SysFont(None ,squaresize//2 - 10)
 font2 = pygame.font.SysFont(None ,200)
-width = 9 * 100
-height = 9 * 100
+width = 9 * squaresize
+height = 9 * squaresize
 size = (width,height)
 screen = pygame.display.set_mode(size)
-graphics = graphics_methods(screen,font2,font1)
+graphics = graphics_methods(screen,font2,font1,squaresize)
 
 def make_play(piece, chosen_spot,board,option_list):
     if piece.piece_let == "K":
@@ -98,10 +90,10 @@ def return_status(turn,board):
         return " "
 
 def oppounent_turn(game, board):
-    pygame.draw.rect(screen, BLACK, (400, 10, 200, 40)) 
+    graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
+    graphics.small_message(game.status, WHITE, graphics.squaresize * 4, graphics.squaresize * 0.1)
     piece = board.board[game.piece_spot[0]][game.piece_spot[1]]
     make_play(piece,game.chosen_spot,board, [game.chosen_spot])
-    graphics.small_message(game.status, WHITE, 400, 10)
 
 def countdown(t,n, posx,posy, stop_cloak):
     while True: 
@@ -122,7 +114,7 @@ def main():
     player = n.getP()
     board = game_board(player)
     graphics.draw_board(board.board)
-    graphics.small_message("Player " + player, WHITE, 390, 860)
+    graphics.small_message("Player " + player, WHITE, graphics.squaresize * 4 - graphics.squaresize * 0.1, graphics.squaresize * 8 + graphics.border * 1.1)
     
     pygame.display.update()
     game_over = False
@@ -132,16 +124,14 @@ def main():
         game = n.get("get")
         if game.ready:
             while not game_over:
-                graphics.draw_timer(get_time(game),10,10)
+                graphics.draw_timer(get_time(game), graphics.border * 0.2, graphics.border * 0.2)
                 pygame.event.get()
                 game = n.get("get")
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
-                        stop_cloak = False
-                        pygame.draw.rect(screen, BLACK, (400, 10, 100, 40))
-                        graphics.small_message(game.status,WHITE,400,10)
-                        timer = threading.Thread(target=countdown, args=[get_time(game),n,10,860, lambda : stop_cloak,])
+                        stop_cloak = False       
+                        timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.border - graphics.border * 0.9 , graphics.squaresize * 8 + graphics.border * 1.1, lambda : stop_cloak,])
                         timer.start()
 
                     if game.status != "CHECKMATE" and game.status != "PAT":
@@ -154,10 +144,10 @@ def main():
                         if game.piece_spot[0] != None:
                             stop_cloak = True
                             timer.join()
-
-                        pygame.draw.rect(screen, BLACK, (400, 10, 100, 40))
+           
                         status = return_status(board.get_oppisite_color(game.turn),board)
-                        graphics.small_message(status,WHITE,400,10)
+                        graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
+                        graphics.small_message(status,WHITE, graphics.squaresize * 4 ,graphics.border * 0.2)
                         n.send(status)
                         n.send(turnMade)
                     else:
