@@ -6,12 +6,14 @@ from game import Game
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-port = 5555
+port = 2525
+server = ''
+# server = '192.168.1.177'
 
-server_ip = socket.gethostbyname(socket.gethostname())
+# server_ip = socket.gethostbyname(socket.gethostname())
 
 try:
-    s.bind((server_ip, port))
+    s.bind((server, port))
 
 except socket.error as e:
     print(str(e))
@@ -24,26 +26,40 @@ def threaded_client(conn,color,game):
     conn.send(str.encode(color))
     while True:
         try:
-            data = conn.recv(2048).decode()
-            if data == "disconnect":
-                break
-            elif data == "get":
-                conn.sendall(pickle.dumps(game))
-            elif data[0] == '(':
-                game.piece_spot = (7 - int(data[1]), int(data[4]))
-                game.chosen_spot = (7 - int(data[8]), int(data[11]))
-                game.update_turn()
-            elif data.isdigit():
-                if game.turn == 'w':
-                    game.white_time = int(data)
-                else:
-                    game.black_time = int(data)
-            elif data:
-                game.status = data
+            data = pickle.loads(conn.recv(2048))
+            if data:
+                if data.get_game:
+                    conn.sendall(pickle.dumps(game))
+                else:       
+                    game.piece_spot = game.reverse_spot(data.turnMade[0])
+                    game.chosen_spot = game.reverse_spot(data.turnMade[1])
+                    game.update_turn()
+                    game.status = data.status
+                    conn.sendall(pickle.dumps(game))
+
+
+
+
+                # if type(data) is str:
+                #     if data == 'get':
+                #         conn.sendall(pickle.dumps(game))
+                #     elif data == "disconnect":
+                #         break
+                #     elif data.isdigit():
+                #         if game.turn == 'w':
+                #             game.white_time = int(data)
+                #         else:
+                #             game.black_time = int(data)
+                #         conn.sendall(pickle.dumps(game))
+                #     else:
+                #         pass
+                # else:
+                    
         except:
+            print(data)
             break
         
-    print ("Connection Closed")
+    print (color + ' LEFT')
     conn.close()
 
 p = 0

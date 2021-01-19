@@ -33,7 +33,7 @@ import time
 from piece import pawn, king, queen, rook, bishop, knight, empty
 from game_board import game_board, copy_game_board
 from network import Network
-from game import Game
+from game import Game, game_data
 from graphics import graphics_methods
 import threading
 
@@ -71,7 +71,7 @@ def run_play(piece,board,screen,player,n):
             graphics.draw_options(option_list)
             chosen_spot = graphics.get_mouse_pos()
             if chosen_spot in option_list:
-                turnMade = str(piece.spot) + "," + str(chosen_spot)
+                turnMade = (piece.spot,chosen_spot)
                 make_play(piece,chosen_spot,board,option_list)
                 return turnMade 
             else:
@@ -113,6 +113,7 @@ def main():
     n = Network()
     player = n.getP()
     board = game_board(player)
+    data = game_data()
 
     graphics.draw_board(board.board,player)
     graphics.small_message("Player " + player, WHITE, graphics.squaresize * 4 - graphics.squaresize * 0.1, graphics.squaresize * 8 + graphics.border * 1.1)
@@ -122,17 +123,21 @@ def main():
     connected = True
     while connected:
         pygame.event.get()
-        game = n.get("get")
-        if game.ready:
+        data.get_game = True
+        game = n.send(data)
+        data.get_game = False
+        if game.ready:      
             while not game_over:
-                graphics.draw_timer(get_time(game), graphics.border * 0.2, graphics.border * 0.2)
+                graphics.draw_timer(get_time(game), graphics.oppounent_timer_pos[0], graphics.oppounent_timer_pos[1])
                 pygame.event.get()
-                game = n.get("get")
+                data.get_game = True
+                game = n.send(data)
+                data.get_game = False
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
                         stop_cloak = False       
-                        timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.border - graphics.border * 0.9 , graphics.squaresize * 8 + graphics.border * 1.1, lambda : stop_cloak,])
+                        timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.timer_pos[0], graphics.timer_pos[1], lambda : stop_cloak,])
                         timer.start()
 
                     if game.status != "CHECKMATE" and game.status != "PAT":
@@ -145,12 +150,14 @@ def main():
                         if game.piece_spot[0] != None:
                             stop_cloak = True
                             timer.join()
-           
+
                         status = return_status(board.get_oppisite_color(game.turn),board)
                         graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
-                        graphics.small_message(status,WHITE, graphics.squaresize * 4 ,graphics.border * 0.2)
-                        n.send(status)
-                        n.send(turnMade)
+                        graphics.small_message(status, WHITE, graphics.squaresize * 4, graphics.border * 0.2)   
+                        data.status = status
+                        data.turnMade = turnMade
+                        game = n.send(data)
+
                     else:
                         stop_cloak = True
                         game_over = True

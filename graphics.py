@@ -18,6 +18,8 @@ class graphics_methods(object):
         self.big_font = big_font
         self.pic_dict = self.build_pic_dict()
         self.border = self.squaresize // 2
+        self.timer_pos = (self.border * 0.2, self.squaresize * 8.5 + self.border * 0.2)
+        self.oppounent_timer_pos = (self.border * 0.2, self.border * 0.2)
         
     def build_pic_dict(self):
         pic_dict = {'w' : { 'P': picture(pygame.image.load(r'Chesspieces\WhitePawn.png'), 61,80),
@@ -80,8 +82,8 @@ class graphics_methods(object):
             self.draw(board[6][i])
             self.draw(board[7][i])
         
-        self.draw_timer(900,self.squaresize//10,self.squaresize//10)
-        self.draw_timer(900,self.squaresize//10, 8.5 * self.squaresize+ self.squaresize // 10)
+        self.draw_timer(900,self.timer_pos[0],self.timer_pos[1])
+        self.draw_timer(900,self.oppounent_timer_pos[0], self.oppounent_timer_pos[1])
 
     # פעולה המחזירה את מיקום הלחיצה
     def get_mouse_pos(self):
@@ -135,7 +137,7 @@ class graphics_methods(object):
 
     # 
     def cover_text(self,xpos,ypos,width,height):
-         pygame.draw.rect(self.screen, BLACK, (round(xpos), round(ypos), round(width), round(height)))
+        pygame.draw.rect(self.screen, BLACK, (round(xpos), round(ypos), round(width), round(height)))
 
 class picture(object):
     def __init__(self,pic,width,height):

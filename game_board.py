@@ -8,58 +8,38 @@ class game_board(object):
         if color =='w':
             self.white_king = king("w", (7, 4) , "K")
             self.black_king = king("b", (0, 4), "K")
-            self.board = self.create_white_board()
+            self.board = self.create_board(7,0)
         else:
             self.white_king = king("w", (0, 4) , "K")
             self.black_king = king("b", (7, 4), "K")
-            self.board = self.create_black_board()     
+            self.board = self.create_board(0,7)     
     
     # בונה את הלוח עם כל החלקים
-    def create_white_board(self):
+    def create_board(self,white_row,black_row):
         board = [[empty() for x in range(8)] for i in range(8)]
-        board[7][4] = self.white_king
-        board[7][3] = queen("w",(7,3), "Q")
-        board[7][0] = rook("w", (7, 0), "R")
-        board[7][7] = rook("w", (7, 7), "R")
-        board[7][2] = bishop("w", (7, 2), "B")
-        board[7][5] = bishop("w", (7, 5), "B")
-        board[7][1] = knight("w" ,(7,1), "k")
-        board[7][6] = knight("w", (7,6), "k")
+        board[white_row][4] = self.white_king
+        board[white_row][3] = queen("w",(white_row,3), "Q")
+        board[white_row][0] = rook("w", (white_row, 0), "R")
+        board[white_row][7] = rook("w", (white_row, 7), "R")
+        board[white_row][2] = bishop("w", (white_row, 2), "B")
+        board[white_row][5] = bishop("w", (white_row, 5), "B")
+        board[white_row][1] = knight("w" ,(white_row,1), "k")
+        board[white_row][6] = knight("w", (white_row,6), "k")
         for i in range(8):
-            board[6][i] = pawn("w",(6,i), "P")
-            board[1][i] = pawn("b",(1,i), "P")
-        board[0][4] = self.black_king
-        board[0][3] = queen("b",(0,3), "Q")
-        board[0][0] = rook("b", (0, 0), "R")
-        board[0][7] = rook("b", (0, 7), "R")
-        board[0][2] = bishop("b", (0, 2), "B") 
-        board[0][5] = bishop("b", (0, 5), "B")
-        board[0][1] = knight("b",(0,1), "k")
-        board[0][6] = knight("b",(0,6), "k")
-        return board
-    
-    # 
-    def create_black_board(self):
-        board = [[empty() for x in range(8)] for i in range(8)]
-        board[0][4] = self.white_king
-        board[0][3] = queen("w",(0,3), "Q")
-        board[0][0] = rook("w", (0, 0), "R")
-        board[0][7] = rook("w", (0, 7), "R")
-        board[0][2] = bishop("w", (0, 2), "B")
-        board[0][5] = bishop("w", (0, 5), "B")
-        board[0][1] = knight("w" ,(0,1), "k")
-        board[0][6] = knight("w", (0,6), "k")
-        for i in range(8):
-            board[1][i] = pawn("w",(1,i), "P")
-            board[6][i] = pawn("b",(6,i), "P")
-        board[7][4] = self.black_king
-        board[7][3] = queen("b",(7,3), "Q")
-        board[7][0] = rook("b", (7, 0), "R")
-        board[7][7] = rook("b", (7, 7), "R")
-        board[7][2] = bishop("b", (7, 2), "B") 
-        board[7][5] = bishop("b", (7, 5), "B")
-        board[7][1] = knight("b",(7,1), "k")
-        board[7][6] = knight("b",(7,6), "k")
+            if white_row == 7:
+                board[6][i] = pawn("w",(6,i), "P")
+                board[1][i] = pawn("b",(1,i), "P")
+            else:
+                board[1][i] = pawn("w",(1,i), "P")
+                board[6][i] = pawn("b",(6,i), "P")
+        board[black_row][4] = self.black_king
+        board[black_row][3] = queen("b",(black_row,3), "Q")
+        board[black_row][0] = rook("b", (black_row, 0), "R")
+        board[black_row][7] = rook("b", (black_row, 7), "R")
+        board[black_row][2] = bishop("b", (black_row, 2), "B") 
+        board[black_row][5] = bishop("b", (black_row, 5), "B")
+        board[black_row][1] = knight("b",(black_row,1), "k")
+        board[black_row][6] = knight("b",(black_row,6), "k")
         return board
         
     # פעולת עזר להדפסת הלוח

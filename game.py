@@ -1,4 +1,3 @@
-from game_board import game_board
 
 class Game(object):
     def __init__(self):
@@ -6,7 +5,7 @@ class Game(object):
         self.piece_spot = (None,None)
         self.chosen_spot = (None,None)
         self.ready = False
-        self.status = ""
+        self.status = " "
         self.white_time = 900
         self.black_time = 900
 
@@ -18,3 +17,12 @@ class Game(object):
             self.turn = 'b'
         else:
             self.turn = 'w'
+
+    def reverse_spot(self,spot):
+        return (7 - spot[0],spot[1])
+
+class game_data(object):
+    def __init__(self):
+        self.get_game = False
+        self.status = " "
+        self.turnMade = ((None,None),(None,None))
