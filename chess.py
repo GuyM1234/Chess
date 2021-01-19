@@ -95,14 +95,14 @@ def oppounent_turn(game, board):
     piece = board.board[game.piece_spot[0]][game.piece_spot[1]]
     make_play(piece,game.chosen_spot,board, [game.chosen_spot])
 
-def countdown(t,n, posx,posy, stop_cloak):
-    while True: 
-        graphics.draw_timer(t,posx,posy)
-        time.sleep(1)
-        t -= 1
-        n.send(str(t))
-        if stop_cloak():
-            break
+# def countdown(t,n, posx,posy, stop_cloak):
+#     while True: 
+#         graphics.draw_timer(t,posx,posy)
+#         time.sleep(1)
+#         t -= 1
+#         n.send(str(t))
+#         if stop_cloak():
+#             break
 
 def get_time(game):
     if game.turn == 'w':
@@ -128,7 +128,7 @@ def main():
         data.get_game = False
         if game.ready:      
             while not game_over:
-                graphics.draw_timer(get_time(game), graphics.oppounent_timer_pos[0], graphics.oppounent_timer_pos[1])
+                # graphics.draw_timer(get_time(game), graphics.oppounent_timer_pos[0], graphics.oppounent_timer_pos[1])
                 pygame.event.get()
                 data.get_game = True
                 game = n.send(data)
@@ -136,9 +136,9 @@ def main():
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
-                        stop_cloak = False       
-                        timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.timer_pos[0], graphics.timer_pos[1], lambda : stop_cloak,])
-                        timer.start()
+                        # stop_cloak = False       
+                        # timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.timer_pos[0], graphics.timer_pos[1], lambda : stop_cloak,])
+                        # timer.start()
 
                     if game.status != "CHECKMATE" and game.status != "PAT":
                         turnMade = None
@@ -147,9 +147,9 @@ def main():
                             piece = board.board[chosen_spot[0]][chosen_spot[1]]
                             turnMade = run_play(piece,board,screen,player,n)
                         
-                        if game.piece_spot[0] != None:
-                            stop_cloak = True
-                            timer.join()
+                        # if game.piece_spot[0] != None:
+                        #     stop_cloak = True
+                        #     timer.join()
 
                         status = return_status(board.get_oppisite_color(game.turn),board)
                         graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
