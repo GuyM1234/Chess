@@ -1,8 +1,10 @@
 from _thread import start_new_thread
+import threading
 import socket
 import pickle
 import sys
 from game import Game
+import time
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -21,42 +23,33 @@ except socket.error as e:
 s.listen()
 print("waiting for connection")
 
+def update_time(game):
+    while True:
+        if game.game_over() or game.out_of_time():
+            break
+        time.sleep(1)
+        game.update_times()
+        
 
 def threaded_client(conn,color,game):
     conn.send(str.encode(color))
+
+    
     while True:
         try:
-            data = pickle.loads(conn.recv(2048))
+            data = pickle.loads(conn.recv(8196 * 3))
             if data:
-                if data.get_game:
+                if data.message == "get_game":
                     conn.sendall(pickle.dumps(game))
-                else:       
+                elif data.message == "update":
+                    data.print_data()
                     game.piece_spot = game.reverse_spot(data.turnMade[0])
                     game.chosen_spot = game.reverse_spot(data.turnMade[1])
                     game.update_turn()
                     game.status = data.status
                     conn.sendall(pickle.dumps(game))
-
-
-
-
-                # if type(data) is str:
-                #     if data == 'get':
-                #         conn.sendall(pickle.dumps(game))
-                #     elif data == "disconnect":
-                #         break
-                #     elif data.isdigit():
-                #         if game.turn == 'w':
-                #             game.white_time = int(data)
-                #         else:
-                #             game.black_time = int(data)
-                #         conn.sendall(pickle.dumps(game))
-                #     else:
-                #         pass
-                # else:
-                    
+            
         except:
-            print(data)
             break
         
     print (color + ' LEFT')
@@ -77,5 +70,7 @@ while True:
         color = 'b'
         print("creating the game")  
         game.ready = True
+        timer = threading.Thread(target=update_time, args=[game])
+        timer.start()
 
     start_new_thread(threaded_client, (conn,color,game))

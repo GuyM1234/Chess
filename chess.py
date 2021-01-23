@@ -37,7 +37,8 @@ from game import Game, game_data
 from graphics import graphics_methods
 import threading
 
-squaresize = int(input("Enter Square Size "))
+# squaresize = int(input("Enter Square Size "))
+squaresize = 75
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -95,25 +96,32 @@ def oppounent_turn(game, board):
     piece = board.board[game.piece_spot[0]][game.piece_spot[1]]
     make_play(piece,game.chosen_spot,board, [game.chosen_spot])
 
-# def countdown(t,n, posx,posy, stop_cloak):
-#     while True: 
-#         graphics.draw_timer(t,posx,posy)
-#         time.sleep(1)
-#         t -= 1
-#         n.send(str(t))
-#         if stop_cloak():
-#             break
+def countdown(game):
+    while True:
+        graphics.draw_timer(game.time[player] ,graphics.timer_pos[0], graphics.timer_pos[1])  
+        graphics.draw_timer(game.time[get_oppisite_color(player)] ,graphics.oppounent_timer_pos[0], graphics.oppounent_timer_pos[1])
+        game = n.get(get)
+        if game.game_over() or game.out_of_time():
+            break
 
 def get_time(game):
     if game.turn == 'w':
         return game.white_time
     return game.black_time
 
+def get_oppisite_color(color):
+    if color == 'w':
+        return 'b'
+    else:
+        return 'w'
+
 def main():
+    global n, player, send, get
     n = Network()
     player = n.getP()
     board = game_board(player)
-    data = game_data()
+    send = game_data("update")
+    get = game_data("get_game")
 
     graphics.draw_board(board.board,player)
     graphics.small_message("Player " + player, WHITE, graphics.squaresize * 4 - graphics.squaresize * 0.1, graphics.squaresize * 8 + graphics.border * 1.1)
@@ -123,43 +131,40 @@ def main():
     connected = True
     while connected:
         pygame.event.get()
-        data.get_game = True
-        game = n.send(data)
-        data.get_game = False
-        if game.ready:      
+        game = n.get(get)
+        if game.ready:
+            draw_timers = threading.Thread(target=countdown, args=[game])
+            draw_timers.start()
             while not game_over:
-                # graphics.draw_timer(get_time(game), graphics.oppounent_timer_pos[0], graphics.oppounent_timer_pos[1])
                 pygame.event.get()
-                data.get_game = True
-                game = n.send(data)
-                data.get_game = False
+                game = n.get(get)
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
-                        # stop_cloak = False       
-                        # timer = threading.Thread(target=countdown, args=[get_time(game), n, graphics.timer_pos[0], graphics.timer_pos[1], lambda : stop_cloak,])
-                        # timer.start()
-
-                    if game.status != "CHECKMATE" and game.status != "PAT":
+                        draw_timers = threading.Thread(target=countdown, args=[game])
+                        draw_timers.start()
+                    if not game.game_over():
                         turnMade = None
-                        while turnMade == None:
+                        while not game.out_of_time() and turnMade == None:
                             chosen_spot = graphics.get_mouse_pos()
                             piece = board.board[chosen_spot[0]][chosen_spot[1]]
                             turnMade = run_play(piece,board,screen,player,n)
                         
-                        # if game.piece_spot[0] != None:
-                        #     stop_cloak = True
-                        #     timer.join()
-
-                        status = return_status(board.get_oppisite_color(game.turn),board)
+                        if turnMade != None:
+                            send.status = return_status(board.get_oppisite_color(game.turn),board)
+                            send.turnMade = turnMade
+                        else:
+                            send.status = player + "OUT OF TIME"
+                            piece_spot = game.reverse_spot(turnMade[0])
+                            chosen_spot = game.reverse_spot(turnMade[1])
+                            send.turnMade = (piece_spot,chosen_spot)
+                            
+                        
                         graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
-                        graphics.small_message(status, WHITE, graphics.squaresize * 4, graphics.border * 0.2)   
-                        data.status = status
-                        data.turnMade = turnMade
-                        game = n.send(data)
+                        graphics.small_message(send.status, WHITE, graphics.squaresize * 4, graphics.border * 0.2)
+                        game = n.get(send)
 
                     else:
-                        stop_cloak = True
                         game_over = True
                         connected = False
                     

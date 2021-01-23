@@ -30,18 +30,32 @@ class pawn(piece):
         rowpos = self.spot[0]
         columnpos = self.spot[1]
         option_list = []
-        if board[rowpos - 1][columnpos].color == "e":
-            option_list.append((rowpos - 1, columnpos))
-            if rowpos == 6 and board[rowpos - 2][columnpos].color == "e":
-                option_list.append((rowpos - 2, columnpos))
+        if game_board.color == self.color:
+            if board[rowpos - 1][columnpos].color == "e":
+                option_list.append((rowpos - 1, columnpos))
+                if rowpos == 6 and board[rowpos - 2][columnpos].color == "e":
+                    option_list.append((rowpos - 2, columnpos))
 
-        if columnpos != 0:
-            if board[rowpos - 1][columnpos - 1].color != self.color and board[rowpos - 1][columnpos - 1].color != 'e':
-                option_list.append((rowpos - 1, columnpos - 1))
+            if columnpos != 0:
+                if board[rowpos - 1][columnpos - 1].color != self.color and board[rowpos - 1][columnpos - 1].color != 'e':
+                    option_list.append((rowpos - 1, columnpos - 1))
 
-        if columnpos != 7:
-            if board[rowpos - 1][columnpos + 1].color != self.color and board[rowpos - 1][columnpos + 1].color != 'e':
-                option_list.append((rowpos - 1, columnpos + 1))
+            if columnpos != 7:
+                if board[rowpos - 1][columnpos + 1].color != self.color and board[rowpos - 1][columnpos + 1].color != 'e':
+                    option_list.append((rowpos - 1, columnpos + 1))
+        else:
+            if board[rowpos + 1][columnpos].color == "e":
+                option_list.append((rowpos + 1, columnpos))
+                if rowpos == 6 and board[rowpos + 2][columnpos].color == "e":
+                    option_list.append((rowpos + 2, columnpos))
+
+            if columnpos != 0:
+                if board[rowpos + 1][columnpos - 1].color != self.color and board[rowpos + 1][columnpos - 1].color != 'e':
+                    option_list.append((rowpos + 1, columnpos - 1))
+
+            if columnpos != 7:
+                if board[rowpos + 1][columnpos + 1].color != self.color and board[rowpos + 1][columnpos + 1].color != 'e':
+                    option_list.append((rowpos + 1, columnpos + 1))
         return option_list
 
     def move(self, chosen_spot, option_list, board):
@@ -287,11 +301,9 @@ class knight(piece):
 
 # אובייקט ריק שיופיע במקומות בלוח שבהן אין כלי בשביל לחסוך בדיקות האם המקום ריק
 class empty(piece):
-    def __init__(self):
-        self.color = "e"
-        self.piece_let = "0"
+    def __init__(self, spot):
+        super().__init__('e', spot, 0)
         self.moved = True
 
     def create_copy(self):
-        return empty()
-
+        return empty(self.spot)

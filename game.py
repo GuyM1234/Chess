@@ -6,8 +6,10 @@ class Game(object):
         self.chosen_spot = (None,None)
         self.ready = False
         self.status = " "
-        self.white_time = 900
-        self.black_time = 900
+        self.time = {
+            "w": 900,
+            "b": 900
+            }
 
     def move(self):
         return (f"{self.piece_spot} {self.chosen_spot}")
@@ -21,8 +23,26 @@ class Game(object):
     def reverse_spot(self,spot):
         return (7 - spot[0],spot[1])
 
+    def update_times(self):
+        self.time[self.turn] -= 1
+    
+    def game_over(self):
+        if self.status == "CHECKMATE" or self.status == "PAT":
+            return True
+        return False
+
+    def out_of_time(self):
+        if self.time['w'] == 0 or self.time['b'] == 0:
+            return True
+        return False
+    
 class game_data(object):
-    def __init__(self):
-        self.get_game = False
+    def __init__(self,message):
+        self.message = message
         self.status = " "
         self.turnMade = ((None,None),(None,None))
+    
+    def print_data(self):
+        print(self.status)
+        print(self.turnMade)
+        

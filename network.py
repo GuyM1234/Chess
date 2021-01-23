@@ -7,7 +7,7 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self host should be the ip on which you run your server
-        self.host = "172.104.135.67"
+        self.host = '172.104.135.67'
         self.port = 2525
         self.addr = (self.host, self.port)
         self.color = self.connect()
@@ -25,7 +25,7 @@ class Network:
 
     def get(self, data):
         try:
-            self.client.send(str.encode(data))
+            self.client.send(pickle.dumps(data))
             reply = pickle.loads(self.client.recv(2048))
             return reply
         except socket.error as e:
@@ -34,7 +34,5 @@ class Network:
     def send(self,data):
         try:
             self.client.send(pickle.dumps(data))
-            reply = pickle.loads(self.client.recv(2048))
-            return reply
         except socket.error as e:
             return str(e)

@@ -129,11 +129,12 @@ class graphics_methods(object):
 
     # פעולה המציירת את החלק
     def draw(self,piece):
-        piece_pic = self.pic_dict[piece.color][piece.piece_let]
-        ypos_offset = round(0.5 * self.squaresize + (self.squaresize - piece_pic.height) / 2)
-        xpos_offset =  round(0.5 * self.squaresize + (self.squaresize - piece_pic.width) / 2)
-        self.screen.blit(piece_pic.pic, (piece.spot[1] * self.squaresize + xpos_offset, piece.spot[0] * self.squaresize + ypos_offset))
-        pygame.display.update()
+        if piece.color != 'e':
+            piece_pic = self.pic_dict[piece.color][piece.piece_let]
+            ypos_offset = round(0.5 * self.squaresize + (self.squaresize - piece_pic.height) / 2)
+            xpos_offset =  round(0.5 * self.squaresize + (self.squaresize - piece_pic.width) / 2)
+            self.screen.blit(piece_pic.pic, (piece.spot[1] * self.squaresize + xpos_offset, piece.spot[0] * self.squaresize + ypos_offset))
+            pygame.display.update()
 
     # 
     def cover_text(self,xpos,ypos,width,height):

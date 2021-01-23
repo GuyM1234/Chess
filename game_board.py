@@ -5,7 +5,8 @@ from piece import pawn, king, queen, rook, bishop, knight, empty
 
 class game_board(object):
     def __init__(self,color):
-        if color =='w':
+        self.color = color
+        if self.color =='w':
             self.white_king = king("w", (7, 4) , "K")
             self.black_king = king("b", (0, 4), "K")
             self.board = self.create_board(7,0)
@@ -16,7 +17,7 @@ class game_board(object):
     
     # בונה את הלוח עם כל החלקים
     def create_board(self,white_row,black_row):
-        board = [[empty() for x in range(8)] for i in range(8)]
+        board = [[empty((i,x)) for x in range(8)] for i in range(8)]
         board[white_row][4] = self.white_king
         board[white_row][3] = queen("w",(white_row,3), "Q")
         board[white_row][0] = rook("w", (white_row, 0), "R")
@@ -26,7 +27,7 @@ class game_board(object):
         board[white_row][1] = knight("w" ,(white_row,1), "k")
         board[white_row][6] = knight("w", (white_row,6), "k")
         for i in range(8):
-            if white_row == 7:
+            if self.color == 'w':
                 board[6][i] = pawn("w",(6,i), "P")
                 board[1][i] = pawn("b",(1,i), "P")
             else:
@@ -58,7 +59,7 @@ class game_board(object):
     # פעולה מעדכנת את הלוח
     def update(self,chosen_spot,piece):
         self.board[chosen_spot[0]][chosen_spot[1]] = piece
-        self.board[piece.spot[0]][piece.spot[1]] = empty()
+        self.board[piece.spot[0]][piece.spot[1]] = empty(piece.spot)
    
     # בודק האם המלך שלך בשח
     def is_check(self, turn):
@@ -113,6 +114,7 @@ class copy_game_board(game_board):
         self.board = self.create_board(board)
         self.white_king = self.board[board.white_king.spot[0]][board.white_king.spot[1]]
         self.black_king = self.board[board.black_king.spot[0]][board.black_king.spot[1]]
+        self.color = board.color
 
     def create_board(self,board):
         copy_board = []
