@@ -22,7 +22,7 @@ class piece(object):
     # פעולה המחזירה העתק בעל יחוס אחר לאובייקט
     def create_copy(self):
         return type(self)(self.color, self.spot,self.piece_let)
-    
+
 class pawn(piece):
     # פעולה מחזירה את כל אפשרויות הזזה של כלי ברשימה של tuples 
     def get_move_options(self, game_board):
@@ -307,3 +307,4 @@ class empty(piece):
 
     def create_copy(self):
         return empty(self.spot)
+    

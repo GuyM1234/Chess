@@ -91,7 +91,7 @@ class graphics_methods(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN:    
                     chosen_xpos = event.pos[0]
                     chosen_ypos = event.pos[1]
                     column_pos = (chosen_xpos - self.border) // self.squaresize

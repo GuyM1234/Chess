@@ -10,7 +10,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 port = 2525
 server = ''
-# server = '192.168.1.177'
+server = '192.168.1.177'
 
 # server_ip = socket.gethostbyname(socket.gethostname())
 
@@ -33,11 +33,9 @@ def update_time(game):
 
 def threaded_client(conn,color,game):
     conn.send(str.encode(color))
-
-    
     while True:
         try:
-            data = pickle.loads(conn.recv(8196 * 3))
+            data = pickle.loads(conn.recv(2048))
             if data:
                 if data.message == "get_game":
                     conn.sendall(pickle.dumps(game))
@@ -47,8 +45,7 @@ def threaded_client(conn,color,game):
                     game.chosen_spot = game.reverse_spot(data.turnMade[1])
                     game.update_turn()
                     game.status = data.status
-                    conn.sendall(pickle.dumps(game))
-            
+                    conn.sendall(pickle.dumps(game)) 
         except:
             break
         

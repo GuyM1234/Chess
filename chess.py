@@ -37,8 +37,7 @@ from game import Game, game_data
 from graphics import graphics_methods
 import threading
 
-# squaresize = int(input("Enter Square Size "))
-squaresize = 75
+squaresize = int(input("Enter Square Size "))
 
 BLACK = (0,0,0)
 WHITE = (255,255,255)
@@ -113,16 +112,17 @@ def get_oppisite_color(color):
     if color == 'w':
         return 'b'
     else:
-        return 'w'
+        return 'w'                                                                                                                        
 
 def main():
-    global n, player, send, get
+    global n, player, send, get, game
     n = Network()
     player = n.getP()
-    board = game_board(player)
     send = game_data("update")
     get = game_data("get_game")
 
+    board = game_board(player)
+    
     graphics.draw_board(board.board,player)
     graphics.small_message("Player " + player, WHITE, graphics.squaresize * 4 - graphics.squaresize * 0.1, graphics.squaresize * 8 + graphics.border * 1.1)
     
@@ -165,9 +165,10 @@ def main():
                         game = n.get(send)
 
                     else:
+                        graphics.cover_text(graphics.squaresize * 4, 0, graphics.squaresize * 3, graphics.border)
+                        graphics.small_message(game.status, WHITE, graphics.squaresize * 4, graphics.border * 0.2)
                         game_over = True
                         connected = False
                     
-
 if __name__ == "__main__":
     main()
