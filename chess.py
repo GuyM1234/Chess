@@ -133,16 +133,16 @@ def main():
         pygame.event.get()
         game = n.get(get)
         if game.ready:
-            draw_timers = threading.Thread(target=countdown, args=[game])
-            draw_timers.start()
+            # draw_timers = threading.Thread(target=countdown, args=[game])
+            # draw_timers.start()
             while not game_over:
                 pygame.event.get()
                 game = n.get(get)
                 if game.turn == player:
                     if game.piece_spot[0] != None:
                         oppounent_turn(game,board)
-                        draw_timers = threading.Thread(target=countdown, args=[game])
-                        draw_timers.start()
+                        # draw_timers = threading.Thread(target=countdown, args=[game])
+                        # draw_timers.start()
                     if not game.game_over():
                         turnMade = None
                         while not game.out_of_time() and turnMade == None:

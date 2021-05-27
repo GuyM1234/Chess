@@ -35,7 +35,7 @@ class graphics_methods(object):
                             'Q': picture(pygame.image.load(r'Chesspieces\BlackQueen.png'),85,80),
                             'K': picture(pygame.image.load(r'Chesspieces\BlackKing.png'),81,80)}
                     }
-    
+
         for color in pic_dict.values():
             for pic in color.values():
                 self.update_pic_to_ratio(pic)

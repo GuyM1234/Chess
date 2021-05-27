@@ -10,7 +10,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 port = 2525
 server = ''
-server = '192.168.1.177'
+server = '172.104.135.67'
 
 # server_ip = socket.gethostbyname(socket.gethostname())
 
