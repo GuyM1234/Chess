@@ -6,6 +6,11 @@ class Spot(NamedTuple):
     colum: int
 
 
+class Move(NamedTuple):
+    move_from: Spot
+    move_to: Spot
+
+
 def is_in_board(row, colum):
     return 0 <= row <= 7 and 0 <= colum <= 7
 
@@ -37,7 +42,7 @@ def print_board(board: [[]]):
         board_printed = board_printed + "["
         for j in range(8):
             if j == 7:
-                if not is_spot_free(self.board, i, j):
+                if not is_spot_free(board, i, j):
                     board_printed += board[i][j].piece_let
                 else:
                     board_printed += "0"

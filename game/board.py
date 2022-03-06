@@ -7,12 +7,13 @@ from game.pieces.queen import Queen
 from game.pieces.rook import Rook
 from game.pieces.piece import Piece
 import copy
+import numpy as np
 
 
 class Board:
     @staticmethod
     def create_board(white_row=7, black_row=0):
-        board = [[None for x in range(8)] for i in range(8)]
+        board = np.empty((8, 8), dtype=Piece)
         board[white_row][4] = King("w")
         board[white_row][3] = Queen("w")
         board[white_row][0] = Rook("w")
